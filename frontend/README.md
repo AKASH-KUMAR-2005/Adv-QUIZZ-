@@ -1,0 +1,1 @@
+The frontend is intentionally simple. Serve it from the same Flask app/static directory or configure a reverse proxy. The API base is /api.
