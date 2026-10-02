@@ -1,1 +1,1020 @@
-<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1"><title>Student Portal</title><link rel="stylesheet" href="style.css"></head><body><header><b>⚡ QuizMaster <i>PRO</i></b><nav><a href="index.html">Home</a></nav></header><main class="hero"><small>STUDENT ACCOUNT</small><h1>Student Login / Register</h1><p>Register once. Your results are stored centrally in the backend database.</p><input id="name" placeholder="Name"><input id="sid" placeholder="Student ID"><input id="password" type="password" placeholder="Password"><input id="phone" placeholder="Guardian phone (optional)"><input id="email" placeholder="Guardian email (optional)"><br><button class="btn primary" onclick="register()">Register</button><button class="btn" onclick="login()">Login</button><p id="msg"></p></main><script>const API='/api';async function register(){let r=await fetch(API+'/auth/student/register',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:name.value,student_id:sid.value,password:password.value,guardian_phone:phone.value,guardian_email:email.value})});let d=await r.json();if(!r.ok)return msg.textContent=d.error;localStorage.token=d.token;localStorage.user=JSON.stringify(d.user);location.href='quiz.html'}async function login(){let r=await fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:sid.value,password:password.value})});let d=await r.json();if(!r.ok)return msg.textContent=d.error;localStorage.token=d.token;localStorage.user=JSON.stringify(d.user);location.href='quiz.html'}</script></body></html>
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#080d18">
+
+  <title>Student Portal | QuizMaster PRO</title>
+
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, sans-serif;
+      background:
+        radial-gradient(circle at 10% 10%, rgba(59,130,246,.15), transparent 30%),
+        radial-gradient(circle at 90% 90%, rgba(139,92,246,.14), transparent 30%),
+        #070b14;
+      color: #fff;
+    }
+
+    header {
+      min-height: 70px;
+      padding: 0 6%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,.08);
+      background: rgba(7,11,20,.85);
+      backdrop-filter: blur(15px);
+    }
+
+    header b {
+      font-size: 21px;
+    }
+
+    header i {
+      color: #38bdf8;
+      font-style: normal;
+    }
+
+    header a {
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .student-container {
+      width: min(1100px, 92%);
+      margin: 50px auto;
+      display: grid;
+      grid-template-columns: 1fr 420px;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .intro small {
+      color: #38bdf8;
+      font-weight: 800;
+      letter-spacing: 2px;
+    }
+
+    .intro h1 {
+      font-size: clamp(42px, 6vw, 70px);
+      line-height: 1;
+      margin: 18px 0;
+      letter-spacing: -2px;
+    }
+
+    .intro h1 span {
+      color: #60a5fa;
+    }
+
+    .intro p {
+      max-width: 580px;
+      color: #94a3b8;
+      font-size: 17px;
+      line-height: 1.7;
+    }
+
+    .features {
+      margin-top: 30px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .feature {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #dbeafe;
+      font-size: 14px;
+    }
+
+    .feature-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: rgba(59,130,246,.12);
+      border: 1px solid rgba(59,130,246,.2);
+    }
+
+    .login-card {
+      background: rgba(15,23,42,.9);
+      border: 1px solid rgba(148,163,184,.18);
+      border-radius: 24px;
+      padding: 28px;
+      box-shadow: 0 25px 70px rgba(0,0,0,.4);
+    }
+
+    .card-top {
+      text-align: center;
+      margin-bottom: 22px;
+    }
+
+    .avatar {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 14px;
+      border-radius: 18px;
+      display: grid;
+      place-items: center;
+      font-size: 28px;
+      background: linear-gradient(135deg,#38bdf8,#6366f1);
+    }
+
+    .card-top h2 {
+      margin: 0 0 7px;
+      font-size: 25px;
+    }
+
+    .card-top p {
+      margin: 0;
+      color: #94a3b8;
+      font-size: 13px;
+    }
+
+    .tabs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5px;
+      padding: 5px;
+      background: #080f1d;
+      border-radius: 13px;
+      margin-bottom: 22px;
+    }
+
+    .tab {
+      border: 0;
+      border-radius: 9px;
+      padding: 11px;
+      background: transparent;
+      color: #94a3b8;
+      cursor: pointer;
+      font-weight: 700;
+    }
+
+    .tab.active {
+      background: #172554;
+      color: white;
+    }
+
+    .field {
+      margin-bottom: 16px;
+    }
+
+    .field label {
+      display: block;
+      margin-bottom: 7px;
+      color: #dbeafe;
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    .field input {
+      width: 100%;
+      padding: 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(148,163,184,.2);
+      background: #080f1d;
+      color: white;
+      outline: none;
+      font-size: 14px;
+    }
+
+    .field input:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 3px rgba(56,189,248,.1);
+    }
+
+    .password-wrapper {
+      position: relative;
+    }
+
+    .password-wrapper input {
+      padding-right: 50px;
+    }
+
+    .show-password {
+      position: absolute;
+      right: 8px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: 0;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 17px;
+    }
+
+    .guardian-box {
+      margin: 5px 0 17px;
+      border-top: 1px solid rgba(148,163,184,.12);
+      padding-top: 14px;
+    }
+
+    .guardian-box summary {
+      cursor: pointer;
+      color: #93c5fd;
+      font-size: 13px;
+      font-weight: 700;
+      margin-bottom: 14px;
+    }
+
+    .remember {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #94a3b8;
+      font-size: 12px;
+      margin-bottom: 16px;
+    }
+
+    .remember input {
+      accent-color: #38bdf8;
+    }
+
+    .submit-btn {
+      width: 100%;
+      padding: 14px;
+      border: 0;
+      border-radius: 13px;
+      background: linear-gradient(135deg,#38bdf8,#6366f1);
+      color: white;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 12px 28px rgba(59,130,246,.2);
+    }
+
+    .submit-btn:hover {
+      transform: translateY(-1px);
+    }
+
+    .submit-btn:disabled {
+      opacity: .6;
+      cursor: wait;
+    }
+
+    #message {
+      min-height: 20px;
+      margin: 14px 0 0;
+      text-align: center;
+      font-size: 13px;
+      color: #94a3b8;
+    }
+
+    #message.success {
+      color: #86efac;
+    }
+
+    #message.error {
+      color: #fca5a5;
+    }
+
+    @media (max-width: 850px) {
+      .student-container {
+        grid-template-columns: 1fr;
+        gap: 30px;
+        margin-top: 30px;
+      }
+
+      .intro {
+        text-align: center;
+      }
+
+      .intro p {
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      .features {
+        width: fit-content;
+        margin-left: auto;
+        margin-right: auto;
+        text-align: left;
+      }
+    }
+
+    @media (max-width: 480px) {
+      header {
+        padding: 0 5%;
+      }
+
+      .student-container {
+        width: 94%;
+        margin: 25px auto 50px;
+      }
+
+      .login-card {
+        padding: 20px;
+        border-radius: 20px;
+      }
+
+      .intro h1 {
+        font-size: 40px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <b>⚡ QuizMaster <i>PRO</i></b>
+
+  <nav>
+    <a href="index.html">Home</a>
+  </nav>
+</header>
+
+
+<main class="student-container">
+
+  <!-- LEFT SIDE -->
+  <section class="intro">
+
+    <small>🎓 STUDENT PORTAL</small>
+
+    <h1>
+      Learn.<br>
+      <span>Practice.</span><br>
+      Improve.
+    </h1>
+
+    <p>
+      Login to your QuizMaster account and start your online quiz.
+      Your attempts and results are stored securely in the central database.
+    </p>
+
+    <div class="features">
+
+      <div class="feature">
+        <span class="feature-icon">⏱️</span>
+        Timed quizzes and automatic submission
+      </div>
+
+      <div class="feature">
+        <span class="feature-icon">📊</span>
+        Automatic marks, percentage and grade
+      </div>
+
+      <div class="feature">
+        <span class="feature-icon">📚</span>
+        Subject and topic based questions
+      </div>
+
+      <div class="feature">
+        <span class="feature-icon">📱</span>
+        Works on mobile, tablet and PC
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- LOGIN CARD -->
+  <section class="login-card">
+
+    <div class="card-top">
+
+      <div class="avatar">
+        👨‍🎓
+      </div>
+
+      <h2 id="cardTitle">
+        Student Login
+      </h2>
+
+      <p id="cardSubtitle">
+        Access your QuizMaster account
+      </p>
+
+    </div>
+
+
+    <!-- LOGIN / REGISTER TABS -->
+
+    <div class="tabs">
+
+      <button
+        type="button"
+        id="loginTab"
+        class="tab active">
+        Login
+      </button>
+
+      <button
+        type="button"
+        id="registerTab"
+        class="tab">
+        Register
+      </button>
+
+    </div>
+
+
+    <form id="studentForm">
+
+      <!-- NAME -->
+
+      <div
+        class="field"
+        id="nameField"
+        style="display:none;">
+
+        <label for="studentName">
+          Full Name
+        </label>
+
+        <input
+          id="studentName"
+          type="text"
+          autocomplete="name"
+          placeholder="Enter your full name">
+
+      </div>
+
+
+      <!-- STUDENT ID -->
+
+      <div class="field">
+
+        <label for="studentId">
+          Student / Roll No.
+        </label>
+
+        <input
+          id="studentId"
+          type="text"
+          autocomplete="username"
+          placeholder="Enter your student or roll number"
+          required>
+
+      </div>
+
+
+      <!-- PASSWORD -->
+
+      <div class="field">
+
+        <label for="studentPassword">
+          Password
+        </label>
+
+        <div class="password-wrapper">
+
+          <input
+            id="studentPassword"
+            type="password"
+            autocomplete="current-password"
+            placeholder="Enter your password"
+            required>
+
+          <button
+            type="button"
+            class="show-password"
+            id="showPassword">
+            👁️
+          </button>
+
+        </div>
+
+      </div>
+
+
+      <!-- GUARDIAN DETAILS -->
+
+      <details
+        class="guardian-box"
+        id="guardianBox"
+        style="display:none;">
+
+        <summary>
+          Guardian Contact — Optional
+        </summary>
+
+        <div class="field">
+
+          <label for="guardianPhone">
+            Guardian Phone
+          </label>
+
+          <input
+            id="guardianPhone"
+            type="tel"
+            autocomplete="tel"
+            placeholder="Optional">
+
+        </div>
+
+        <div class="field">
+
+          <label for="guardianEmail">
+            Guardian Email
+          </label>
+
+          <input
+            id="guardianEmail"
+            type="email"
+            autocomplete="email"
+            placeholder="Optional">
+
+        </div>
+
+      </details>
+
+
+      <!-- REMEMBER -->
+
+      <label class="remember">
+
+        <input
+          type="checkbox"
+          id="rememberMe"
+          checked>
+
+        Remember me on this device
+
+      </label>
+
+
+      <!-- BUTTON -->
+
+      <button
+        type="submit"
+        id="submitBtn"
+        class="submit-btn">
+
+        Login to QuizMaster
+
+      </button>
+
+
+      <!-- MESSAGE -->
+
+      <p id="message"></p>
+
+    </form>
+
+  </section>
+
+</main>
+
+
+<script>
+
+const API = "/api";
+
+let mode = "login";
+
+
+const form =
+  document.getElementById("studentForm");
+
+const loginTab =
+  document.getElementById("loginTab");
+
+const registerTab =
+  document.getElementById("registerTab");
+
+const nameField =
+  document.getElementById("nameField");
+
+const guardianBox =
+  document.getElementById("guardianBox");
+
+const cardTitle =
+  document.getElementById("cardTitle");
+
+const cardSubtitle =
+  document.getElementById("cardSubtitle");
+
+const submitBtn =
+  document.getElementById("submitBtn");
+
+const message =
+  document.getElementById("message");
+
+const passwordInput =
+  document.getElementById("studentPassword");
+
+
+/* ---------------------------
+   LOGIN / REGISTER MODE
+---------------------------- */
+
+function setMode(newMode) {
+
+  mode = newMode;
+
+  const registerMode =
+    mode === "register";
+
+
+  loginTab.classList.toggle(
+    "active",
+    !registerMode
+  );
+
+  registerTab.classList.toggle(
+    "active",
+    registerMode
+  );
+
+
+  nameField.style.display =
+    registerMode ? "block" : "none";
+
+
+  guardianBox.style.display =
+    registerMode ? "block" : "none";
+
+
+  cardTitle.textContent =
+    registerMode
+      ? "Create Student Account"
+      : "Student Login";
+
+
+  cardSubtitle.textContent =
+    registerMode
+      ? "Register once to start taking quizzes"
+      : "Access your QuizMaster account";
+
+
+  submitBtn.textContent =
+    registerMode
+      ? "Create Account"
+      : "Login to QuizMaster";
+
+
+  passwordInput.autocomplete =
+    registerMode
+      ? "new-password"
+      : "current-password";
+
+
+  clearMessage();
+}
+
+
+loginTab.addEventListener(
+  "click",
+  function () {
+
+    setMode("login");
+
+  }
+);
+
+
+registerTab.addEventListener(
+  "click",
+  function () {
+
+    setMode("register");
+
+  }
+);
+
+
+/* ---------------------------
+   SHOW / HIDE PASSWORD
+---------------------------- */
+
+document
+  .getElementById("showPassword")
+  .addEventListener(
+    "click",
+    function () {
+
+      if (
+        passwordInput.type === "password"
+      ) {
+
+        passwordInput.type = "text";
+
+        this.textContent = "🙈";
+
+      } else {
+
+        passwordInput.type = "password";
+
+        this.textContent = "👁️";
+
+      }
+
+    }
+  );
+
+
+/* ---------------------------
+   MESSAGE
+---------------------------- */
+
+function clearMessage() {
+
+  message.textContent = "";
+
+  message.className = "";
+
+}
+
+
+function showMessage(
+  text,
+  type = ""
+) {
+
+  message.textContent = text;
+
+  message.className = type;
+
+}
+
+
+/* ---------------------------
+   LOGIN / REGISTER
+---------------------------- */
+
+form.addEventListener(
+  "submit",
+  async function (event) {
+
+    event.preventDefault();
+
+
+    const name =
+      document
+        .getElementById("studentName")
+        .value
+        .trim();
+
+
+    const studentId =
+      document
+        .getElementById("studentId")
+        .value
+        .trim();
+
+
+    const password =
+      passwordInput.value.trim();
+
+
+    const guardianPhone =
+      document
+        .getElementById("guardianPhone")
+        .value
+        .trim();
+
+
+    const guardianEmail =
+      document
+        .getElementById("guardianEmail")
+        .value
+        .trim();
+
+
+    const remember =
+      document
+        .getElementById("rememberMe")
+        .checked;
+
+
+    /* VALIDATION */
+
+    if (
+      !studentId ||
+      !password
+    ) {
+
+      showMessage(
+        "Please enter Student/Roll No. and Password.",
+        "error"
+      );
+
+      return;
+
+    }
+
+
+    if (
+      mode === "register" &&
+      !name
+    ) {
+
+      showMessage(
+        "Please enter your full name.",
+        "error"
+      );
+
+      return;
+
+    }
+
+
+    submitBtn.disabled = true;
+
+
+    showMessage(
+      mode === "register"
+        ? "Creating your account..."
+        : "Signing you in..."
+    );
+
+
+    try {
+
+      let endpoint;
+
+      let body;
+
+
+      /* REGISTER */
+
+      if (mode === "register") {
+
+        endpoint =
+          API +
+          "/auth/student/register";
+
+
+        body = {
+
+          name: name,
+
+          student_id: studentId,
+
+          password: password,
+
+          guardian_phone:
+            guardianPhone || null,
+
+          guardian_email:
+            guardianEmail || null
+
+        };
+
+      }
+
+
+      /* LOGIN */
+
+      else {
+
+        endpoint =
+          API +
+          "/auth/login";
+
+
+        body = {
+
+          username: studentId,
+
+          password: password
+
+        };
+
+      }
+
+
+      const response =
+        await fetch(
+          endpoint,
+          {
+
+            method: "POST",
+
+            headers: {
+
+              "Content-Type":
+                "application/json"
+
+            },
+
+            body:
+              JSON.stringify(body)
+
+          }
+        );
+
+
+      const data =
+        await response.json();
+
+
+      if (!response.ok) {
+
+        throw new Error(
+          data.error ||
+          data.message ||
+          "Request failed."
+        );
+
+      }
+
+
+      /* SAVE LOGIN */
+
+      if (remember) {
+
+        localStorage.setItem(
+          "token",
+          data.token
+        );
+
+        localStorage.setItem(
+          "user",
+          JSON.stringify(data.user)
+        );
+
+      } else {
+
+        sessionStorage.setItem(
+          "token",
+          data.token
+        );
+
+        sessionStorage.setItem(
+          "user",
+          JSON.stringify(data.user)
+        );
+
+      }
+
+
+      showMessage(
+        mode === "register"
+          ? "Account created successfully!"
+          : "Login successful!",
+        "success"
+      );
+
+
+      /* OPEN QUIZ */
+
+      setTimeout(
+        function () {
+
+          window.location.href =
+            "quiz.html";
+
+        },
+        700
+      );
+
+
+    } catch (error) {
+
+      console.error(error);
+
+      showMessage(
+        error.message ||
+        "Unable to connect to the server.",
+        "error"
+      );
+
+    } finally {
+
+      submitBtn.disabled = false;
+
+    }
+
+  }
+);
+
+
+/* ---------------------------
+   EXISTING LOGIN
+---------------------------- */
+
+if (
+  localStorage.getItem("token") ||
+  sessionStorage.getItem("token")
+) {
+
+  showMessage(
+    "You are already signed in on this device.",
+    "success"
+  );
+
+}
+
+</script>
+
+</body>
+</html>
+```
